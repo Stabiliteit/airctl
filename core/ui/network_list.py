@@ -66,14 +66,54 @@ class NetworkListWidget(Gtk.ListBox):
             return
 
         if network["security"]:
+            if NetworkManager._check_known_network(network["ssid"]):
+
+                def on_confirm(confirmed):
+                    if not confirmed:
+                        return
+                    result = NetworkManager.connect_network(network["ssid"])
+                    if result["success"]:
+                        DialogBox(
+                            self.parent,
+                            network["ssid"],
+                            lambda _: self.refresh_networks(),
+                        ).info(result["message"])
+                    else:
+                        DialogBox(self.parent, network["ssid"], None).error(
+                            result["message"]
+                        )
+
+                DialogBox(self.parent, network["ssid"], on_confirm).confirmation(
+                    message=f"Connect to {network['ssid']}?"
+                )
+                return
+
+            def on_password(password):
+                if not password:
+                    return
+                result = NetworkManager.connect_network(network["ssid"], password)
+                if result["success"]:
+                    DialogBox(
+                        self.parent, network["ssid"], lambda _: self.refresh_networks()
+                    ).info(result["message"])
+                else:
+                    DialogBox(self.parent, network["ssid"], None).error(
+                        result["message"]
+                    )
+
             DialogBox(
                 self.parent,
                 network["ssid"],
-                lambda password: password
-                and NetworkManager.connect_network(network["ssid"], password),
+                on_password,
             ).password()
         else:
-            NetworkManager.connect_network(network["ssid"], None)
+            result = NetworkManager.connect_network(network["ssid"], None)
+            if result["success"]:
+                DialogBox(
+                    self.parent, network["ssid"], lambda _: self.refresh_networks()
+                ).info(result["message"])
+            else:
+                DialogBox(self.parent, network["ssid"], None).error(result["message"])
 
     def get_signal_class(self, signal):
         if signal >= 75:
