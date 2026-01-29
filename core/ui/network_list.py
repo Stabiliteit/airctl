@@ -3,6 +3,7 @@ from gi.repository import Gtk
 
 from core.network_manager import NetworkManager
 from core.ui.dialog_box import DialogBox
+from core.ui.network_info import NetworkInfoWindow
 
 gi.require_version("Gtk", "4.0")
 
@@ -61,8 +62,14 @@ class NetworkListWidget(Gtk.ListBox):
 
             self.append(row)
 
+    def open_network_info(self, ssid):
+        network_info_window = NetworkInfoWindow(self.parent, ssid)
+        network_info_window.connect("close-request", lambda _: self.refresh_networks())
+        network_info_window.present()
+
     def on_network_selected(self, network):
         if network["active"]:
+            self.open_network_info(network["ssid"])
             return
 
         if network["security"]:
@@ -172,7 +179,7 @@ class NetworkListWidget(Gtk.ListBox):
         info_button.add_css_class("flat")
         info_button.add_css_class("circular")
         info_button.add_css_class("network-info-button")
-        info_button.set_tooltip_text("Connect")
+        info_button.set_tooltip_text("Network Info" if network["active"] else "Connect")
         info_button.connect(
             "clicked",
             lambda *_: self.on_network_selected(network),
