@@ -63,8 +63,8 @@ class NetworkManager:
     @staticmethod
     def disconnect_network():
         try:
-            device = nmcli.device.show()[0].device
-            nmcli.device.disconnect(device)
+            name = nmcli.device()[0].connection
+            nmcli.connection.down(name=name)
             return {"success": True, "message": "Successfully disconnected"}
         except Exception as err:
             return {"success": False, "message": f"Error disconnecting: {str(err)}"}
