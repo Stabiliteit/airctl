@@ -18,6 +18,21 @@ nmcli.disable_use_sudo()
 
 class NetworkManager:
     @staticmethod
+    def wifi_status():
+        return nmcli.radio.wifi()
+
+    @staticmethod
+    def toggle_wifi():
+        try:
+            if nmcli.radio.wifi():
+                return nmcli.radio.wifi_off()
+
+            return nmcli.radio.wifi_on()
+
+        except Exception:
+            pass
+
+    @staticmethod
     def scan_networks() -> list[scaned_networks]:
         nmcli.device.wifi_rescan()
         nets = nmcli.device.wifi()

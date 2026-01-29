@@ -3,6 +3,7 @@ import sys
 import gi
 from gi.repository import Gdk, Gtk
 
+from core.network_manager import NetworkManager
 from core.ui.app_header import AppHeader
 from core.ui.network_list import NetworkListWidget
 
@@ -46,6 +47,8 @@ class AppWindow(Gtk.ApplicationWindow):
         toggle_switch = Gtk.Switch()
         toggle_switch.set_css_classes(["switch-custom"])
         toggle_switch.props.halign = Gtk.Align.END
+        toggle_switch.props.active = NetworkManager.wifi_status()
+        toggle_switch.connect("notify::active", self._swtich_active)
 
         hbox.append(toggle_switch)
 
@@ -56,7 +59,7 @@ class AppWindow(Gtk.ApplicationWindow):
         container.append(self.listBox)
 
     def _swtich_active(self, switch, param):
-        print("switch actice")
+        NetworkManager.toggle_wifi()
 
 
 class MyApp(Gtk.Application):
