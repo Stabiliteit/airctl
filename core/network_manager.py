@@ -2,7 +2,7 @@ import time
 
 import nmcli
 
-from core.models import scaned_networks
+from core.models import NetworkInfo, scaned_networks
 
 """
 Responsibilities:
@@ -90,8 +90,12 @@ class NetworkManager:
     #     pass
 
     @staticmethod
-    def get_network_info():
-        pass
+    def get_network_info(ssid: str):
+        try:
+            res = nmcli.connection.show(name=ssid)
+            return NetworkInfo.from_nmcli_dict(dict(res))
+        except Exception:
+            return None
 
     @staticmethod
     def forget_network(ssid: str):
