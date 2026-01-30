@@ -70,7 +70,7 @@ class NetworkInfoWindow(Gtk.Window):
 
         back_button = Gtk.Button()
         back_button.set_icon_name("go-previous-symbolic")
-        back_button.connect("clicked", lambda _: self.close())
+        back_button.connect("clicked", lambda _: self.destroy())
 
         nav_box.append(back_button)
 
@@ -371,7 +371,7 @@ class NetworkInfoWindow(Gtk.Window):
 
             result = NetworkManager.forget_network(self.ssid)
             if result["success"]:
-                self.close()
+                self.destroy()
                 if self.parent:
                     DialogBox(self.parent, self.ssid, None).info(result["message"])
             else:
@@ -388,7 +388,7 @@ class NetworkInfoWindow(Gtk.Window):
 
             result = NetworkManager.disconnect_network()
             if result["success"]:
-                self.close()
+                self.destroy()
                 if self.parent:
                     DialogBox(self.parent, self.ssid, None).info(result["message"])
             else:
