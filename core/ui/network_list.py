@@ -1,5 +1,5 @@
 import gi
-from gi.repository import Gtk
+from gi.repository import GLib, Gtk
 
 from core.network_manager import NetworkManager
 from core.ui.dialog_box import DialogBox
@@ -33,7 +33,8 @@ class NetworkListWidget(Gtk.ListBox):
 
         self.append(header)
 
-        self.create_network_list()
+        GLib.idle_add(self.create_network_list)
+        GLib.timeout_add(3000, self.refresh_networks)
 
     def clear_networks(self):
         rows = list(self)
@@ -43,6 +44,7 @@ class NetworkListWidget(Gtk.ListBox):
     def refresh_networks(self, *_):
         self.clear_networks()
         self.create_network_list()
+        return True
 
     def create_network_list(self):
         networks = NetworkManager.scan_networks()
