@@ -9,3 +9,10 @@ dependencies = [
     "nuitka>=2.8.10",
     "pygobject>=3.54.5",
 ]
+
+[project.scripts]
+airctl = "airctl.main:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
