@@ -10,29 +10,40 @@ from core.ui.network_info import NetworkInfoWindow
 gi.require_version("Gtk", "4.0")
 
 
-class NetworkListWidget(Gtk.ListBox):
+class NetworkListWidget(Gtk.Box):
     def __init__(self, parent, widget_stack):
-        super().__init__()
+        super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.parent = parent
         self.widget_stack = widget_stack
-        self.set_selection_mode(Gtk.SelectionMode.NONE)
+        self.set_spacing(0)
 
         self.wifi_enabled = NetworkManager.wifi_status()
         self.connecting_ssid = None
         self.refresh_timeout_id = None
+        self.active_network = None
 
-        self._create_header()
+        scrolled = Gtk.ScrolledWindow()
+        scrolled.set_vexpand(True)
+        scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
 
-        if self.wifi_enabled:
-            GLib.idle_add(self._scan_with_spinner)
-            self._start_auto_refresh()
+        content_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        content_box.set_spacing(16)
+        content_box.set_margin_top(16)
+        content_box.set_margin_bottom(16)
+        content_box.set_margin_start(16)
+        content_box.set_margin_end(16)
 
-    def _create_header(self):
-        header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
-        header.add_css_class("network-header")
+        self.connected_card_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.connected_card_box.set_spacing(0)
+        content_box.append(self.connected_card_box)
 
-        title = Gtk.Label(label="WiFi Networks", xalign=0)
-        title.set_hexpand(True)
+        networks_header_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        networks_header_box.set_spacing(12)
+
+        networks_label = Gtk.Label(label="Networks")
+        networks_label.set_halign(Gtk.Align.START)
+        networks_label.set_hexpand(True)
+        networks_label.add_css_class("networks-title")
 
         self.spinner = Gtk.Spinner()
         self.spinner.set_visible(False)
@@ -44,11 +55,22 @@ class NetworkListWidget(Gtk.ListBox):
         self.refresh_button.set_tooltip_text("Refresh networks")
         self.refresh_button.connect("clicked", lambda _: self._scan_with_spinner())
 
-        header.append(title)
-        header.append(self.spinner)
-        header.append(self.refresh_button)
+        networks_header_box.append(networks_label)
+        networks_header_box.append(self.spinner)
+        networks_header_box.append(self.refresh_button)
 
-        self.append(header)
+        content_box.append(networks_header_box)
+
+        self.networks_list_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.networks_list_box.set_spacing(8)
+        content_box.append(self.networks_list_box)
+
+        scrolled.set_child(content_box)
+        self.append(scrolled)
+
+        if self.wifi_enabled:
+            GLib.idle_add(self._scan_with_spinner)
+            self._start_auto_refresh()
 
     def on_wifi_enabled(self):
         self.wifi_enabled = True
@@ -61,6 +83,7 @@ class NetworkListWidget(Gtk.ListBox):
         self._clear_networks()
         self._stop_auto_refresh()
         self.connecting_ssid = None
+        self.active_network = None
 
     def _start_auto_refresh(self):
         if self.refresh_timeout_id is None:
@@ -97,114 +120,31 @@ class NetworkListWidget(Gtk.ListBox):
         self.refresh_button.set_sensitive(not loading)
 
     def _clear_networks(self):
-        for row in list(self)[1:]:
-            self.remove(row)
+        while True:
+            child = self.connected_card_box.get_first_child()
+            if child is None:
+                break
+            self.connected_card_box.remove(child)
+
+        while True:
+            child = self.networks_list_box.get_first_child()
+            if child is None:
+                break
+            self.networks_list_box.remove(child)
 
     def _populate_networks(self):
         if not self.wifi_enabled:
             return
 
-        for network in NetworkManager.scan_networks():
-            row = Gtk.ListBoxRow()
-            row.set_activatable(False)
-            row.set_child(self._create_network_row(network))
+        networks = NetworkManager.scan_networks()
+        self.active_network = None
 
-            click = Gtk.GestureClick()
-            click.connect(
-                "released", lambda *args, n=network: self._on_network_click(n)
-            )
-            row.get_child().add_controller(click)
-
-            self.append(row)
-
-    def _create_network_row(self, network):
-        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
-
-        # SSID and status
-        ssid_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
-        ssid_box.set_hexpand(True)
-
-        ssid_label = Gtk.Label(label=network["ssid"], xalign=0)
-        ssid_label.set_ellipsize(3)
-        ssid_label.set_max_width_chars(30)
-        ssid_box.append(ssid_label)
-
-        # Status label
-        if network["active"]:
-            status = Gtk.Label(label="Connected", xalign=0)
-            status.set_opacity(0.7)
-            status.set_css_classes(["caption", "dim-label"])
-            ssid_box.append(status)
-        elif self.connecting_ssid == network["ssid"]:
-            status = Gtk.Label(label="Connecting...", xalign=0)
-            status.set_opacity(0.7)
-            status.set_css_classes(["caption", "dim-label"])
-            ssid_box.append(status)
-
-        box.append(ssid_box)
-
-        # Signal icon and strength
-        signal_icon = Gtk.Image()
-        signal_strength = network["signal"]
-        signal_class = self._get_signal_class(signal_strength)
-
-        if signal_strength >= 75:
-            signal_icon.set_from_icon_name("network-wireless-signal-excellent-symbolic")
-        elif signal_strength >= 50:
-            signal_icon.set_from_icon_name("network-wireless-signal-good-symbolic")
-        elif signal_strength >= 25:
-            signal_icon.set_from_icon_name("network-wireless-signal-ok-symbolic")
-        else:
-            signal_icon.set_from_icon_name("network-wireless-signal-weak-symbolic")
-        signal_icon.add_css_class(signal_class)
-
-        signal_label = Gtk.Label(label=f"{signal_strength}%")
-        signal_label.set_width_chars(4)
-        signal_label.add_css_class(signal_class)
-
-        box.append(signal_icon)
-        box.append(signal_label)
-
-        # Security icon
-        security_icon = Gtk.Image()
-        if network["security"]:
-            security_icon.set_from_icon_name("network-wireless-encrypted-symbolic")
-            security_icon.set_tooltip_text("Secured network")
-        else:
-            security_icon.set_from_icon_name("network-wireless-no-route-symbolic")
-            security_icon.set_tooltip_text("Open network")
-            security_icon.set_opacity(0.5)
-        box.append(security_icon)
-
-        # Connecting spinner or info button
-        if self.connecting_ssid == network["ssid"]:
-            spinner = Gtk.Spinner()
-            spinner.start()
-            spinner.set_tooltip_text("Connecting...")
-            box.append(spinner)
-        elif network["active"]:
-            info_btn = Gtk.Button()
-            info_btn.set_icon_name("go-next-symbolic")
-            info_btn.add_css_class("flat")
-            info_btn.add_css_class("circular")
-            info_btn.add_css_class("network-info-button")
-            info_btn.set_tooltip_text("Network Info")
-            info_btn.connect(
-                "clicked", lambda *_: self._open_network_info(network["ssid"])
-            )
-            box.append(info_btn)
-
-        # Set row style
-        if network["active"]:
-            box.set_css_classes(["connected-network"])
-        elif self.connecting_ssid == network["ssid"]:
-            box.set_css_classes(["connecting-network"])
-        elif NetworkManager._check_known_network(network["ssid"]):
-            box.set_css_classes(["known-network"])
-        else:
-            box.set_css_classes(["unknown-network"])
-
-        return box
+        for network in networks:
+            if network["active"]:
+                self.active_network = network
+                self.connected_card_box.append(self._create_connected_card(network))
+            else:
+                self.networks_list_box.append(self._create_network_item(network))
 
     def _get_signal_class(self, signal):
         if signal >= 75:
@@ -215,15 +155,128 @@ class NetworkListWidget(Gtk.ListBox):
             return "signal-fair"
         return "signal-weak"
 
+    def _create_connected_card(self, network):
+        card = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        card.set_spacing(16)
+        card.add_css_class("connected-card")
+
+        signal_icon = Gtk.Image()
+        signal_strength = network["signal"]
+        signal_class = self._get_signal_class(signal_strength)
+        if signal_strength >= 75:
+            signal_icon.set_from_icon_name("network-wireless-signal-excellent-symbolic")
+        elif signal_strength >= 50:
+            signal_icon.set_from_icon_name("network-wireless-signal-good-symbolic")
+        elif signal_strength >= 25:
+            signal_icon.set_from_icon_name("network-wireless-signal-ok-symbolic")
+        else:
+            signal_icon.set_from_icon_name("network-wireless-signal-weak-symbolic")
+        signal_icon.set_pixel_size(32)
+        signal_icon.add_css_class(signal_class)
+
+        card.append(signal_icon)
+
+        text_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        text_box.set_spacing(4)
+        text_box.set_hexpand(True)
+
+        ssid_label = Gtk.Label(label=network["ssid"])
+        ssid_label.set_halign(Gtk.Align.START)
+        ssid_label.add_css_class("connected-ssid")
+
+        status_label = Gtk.Label(label="Connected")
+        status_label.set_halign(Gtk.Align.START)
+        status_label.set_opacity(0.7)
+
+        text_box.append(ssid_label)
+        text_box.append(status_label)
+
+        card.append(text_box)
+
+        signal_percentage_label = Gtk.Label(label=f"{signal_strength}%")
+        signal_percentage_label.add_css_class(signal_class)
+        signal_percentage_label.set_valign(Gtk.Align.CENTER)
+        signal_percentage_label.set_margin_end(8)
+
+        card.append(signal_percentage_label)
+
+        settings_button = Gtk.Button()
+        settings_button.set_icon_name("emblem-system-symbolic")
+        settings_button.add_css_class("flat")
+        settings_button.add_css_class("circular")
+        settings_button.set_valign(Gtk.Align.CENTER)
+        settings_button.set_tooltip_text("Network Settings")
+        settings_button.connect("clicked", lambda _: self._open_network_info(network["ssid"]))
+
+        card.append(settings_button)
+
+        click = Gtk.GestureClick()
+        click.connect("released", lambda *args: self._open_network_info(network["ssid"]))
+        card.add_controller(click)
+
+        return card
+
+    def _create_network_item(self, network):
+        item = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        item.set_spacing(12)
+        item.add_css_class("network-item")
+
+        signal_icon = Gtk.Image()
+        signal_strength = network["signal"]
+        signal_class = self._get_signal_class(signal_strength)
+        if signal_strength >= 75:
+            signal_icon.set_from_icon_name("network-wireless-signal-excellent-symbolic")
+        elif signal_strength >= 50:
+            signal_icon.set_from_icon_name("network-wireless-signal-good-symbolic")
+        elif signal_strength >= 25:
+            signal_icon.set_from_icon_name("network-wireless-signal-ok-symbolic")
+        else:
+            signal_icon.set_from_icon_name("network-wireless-signal-weak-symbolic")
+        signal_icon.set_pixel_size(24)
+        signal_icon.add_css_class(signal_class)
+
+        item.append(signal_icon)
+
+        ssid_label = Gtk.Label(label=network["ssid"])
+        ssid_label.set_halign(Gtk.Align.START)
+        ssid_label.set_hexpand(True)
+        ssid_label.set_ellipsize(3)
+
+        item.append(ssid_label)
+
+        signal_label = Gtk.Label(label=f"{signal_strength}%")
+        signal_label.set_width_chars(4)
+        signal_label.add_css_class(signal_class)
+
+        item.append(signal_label)
+
+        if self.connecting_ssid == network["ssid"]:
+            spinner = Gtk.Spinner()
+            spinner.start()
+            spinner.set_tooltip_text("Connecting...")
+            item.append(spinner)
+        else:
+            if network["security"]:
+                security_icon = Gtk.Image()
+                security_icon.set_from_icon_name("network-wireless-encrypted-symbolic")
+                security_icon.set_pixel_size(20)
+                security_icon.set_opacity(0.7)
+                security_icon.set_tooltip_text("Secured network")
+                item.append(security_icon)
+
+        click = Gtk.GestureClick()
+        click.connect("released", lambda *args, n=network: self._on_network_click(n))
+        item.add_controller(click)
+
+        return item
+
     def _on_network_click(self, network):
         if not self.wifi_enabled:
             return
 
         if network["active"]:
             self._open_network_info(network["ssid"])
-        elif network["security"] and NetworkManager._check_known_network(
-            network["ssid"]
-        ):
+        elif network["security"] and NetworkManager._check_known_network(network["ssid"]):
             self._show_connection_confirm(network["ssid"])
         elif network["security"]:
             self._show_password_dialog(network["ssid"])

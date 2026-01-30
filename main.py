@@ -22,44 +22,47 @@ class AppWindow(Gtk.ApplicationWindow):
         super().__init__(application=app)
 
         self.set_title(title="AIRCTL")
-        self.set_default_size(450, 350)
+        self.set_default_size(450, 600)
 
         header_bar = AppHeader()
         self.set_titlebar(header_bar)
 
-        container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        self.set_child(container)
+        main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        main_box.set_spacing(0)
+        self.set_child(main_box)
 
-        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=20)
-        hbox.props.valign = Gtk.Align.START
+        wifi_toggle_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        wifi_toggle_box.set_margin_top(16)
+        wifi_toggle_box.set_margin_bottom(16)
+        wifi_toggle_box.set_margin_start(16)
+        wifi_toggle_box.set_margin_end(16)
+        wifi_toggle_box.set_spacing(12)
 
-        label = Gtk.Label(label="WiFi")
-        label.set_css_classes(["label-wifi"])
-
-        hbox.append(label)
-
-        label = Gtk.Label(label="WiFi")
-
-        label.set_margin_top(10)
-        label.set_margin_bottom(5)
-        label.set_margin_start(15)
-        label.set_margin_end(15)
+        wifi_label = Gtk.Label(label="Use Wi-Fi")
+        wifi_label.set_halign(Gtk.Align.START)
+        wifi_label.set_hexpand(True)
+        wifi_label.add_css_class("wifi-toggle-label")
 
         self.toggle_switch = Gtk.Switch()
-        self.toggle_switch.set_css_classes(["switch-custom"])
-        self.toggle_switch.props.halign = Gtk.Align.END
-        self.toggle_switch.props.active = NetworkManager.wifi_status()
+        self.toggle_switch.set_halign(Gtk.Align.END)
+        self.toggle_switch.set_active(NetworkManager.wifi_status())
         self.toggle_switch.connect("notify::active", self._switch_active)
 
-        hbox.append(self.toggle_switch)
+        wifi_toggle_box.append(wifi_label)
+        wifi_toggle_box.append(self.toggle_switch)
 
-        container.append(hbox)
+        main_box.append(wifi_toggle_box)
+
+        separator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+        separator.set_margin_start(16)
+        separator.set_margin_end(16)
+        main_box.append(separator)
 
         self.widget_stack = Gtk.Stack()
-        container.append(self.widget_stack)
+        self.widget_stack.set_vexpand(True)
+        main_box.append(self.widget_stack)
 
         self.listBox = NetworkListWidget(self, self.widget_stack)
-        self.listBox.props.selection_mode = Gtk.SelectionMode.NONE
 
         self.wifi_off_widget = WiFiOffWidget()
 
@@ -68,7 +71,6 @@ class AppWindow(Gtk.ApplicationWindow):
 
         self._update_wifi_state(NetworkManager.wifi_status())
 
-        # Poll wifi status every second to catch external changes
         GLib.timeout_add(1000, self._check_wifi_status)
 
     def _check_wifi_status(self):
@@ -76,13 +78,12 @@ class AppWindow(Gtk.ApplicationWindow):
         switch_status = self.toggle_switch.get_active()
 
         if current_status != switch_status:
-            # Block the signal handler to prevent recursive calls
             self.toggle_switch.handler_block_by_func(self._switch_active)
             self.toggle_switch.set_active(current_status)
             self.toggle_switch.handler_unblock_by_func(self._switch_active)
             self._update_wifi_state(current_status)
 
-        return True  # Continue the timeout
+        return True
 
     def _update_wifi_state(self, is_on):
         if is_on:
@@ -96,7 +97,6 @@ class AppWindow(Gtk.ApplicationWindow):
         is_active = switch.get_active()
         NetworkManager.toggle_wifi()
 
-        # Wait a bit for wifi to actually change state
         GLib.timeout_add(500, lambda: self._update_wifi_state(is_active))
 
 

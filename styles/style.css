@@ -1,11 +1,44 @@
-.label-wifi {
-    font-size: 18px;
-    font-weight: bold;
+.wifi-toggle-label {
+    font-size: 20px;
+    font-weight: 600;
 }
 
-.switch-custom {
-    min-width: 60px;
-    min-height: 30px;
+.networks-title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.connected-card {
+    background: rgba(45, 45, 58, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.connected-card:hover {
+    background: rgba(50, 50, 65, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.connected-ssid {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.network-item {
+    background: rgba(45, 45, 58, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.3s ease;
+}
+
+.network-item:hover {
+    background: rgba(50, 50, 65, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
 }
 
 .unknown-network {
@@ -70,19 +103,19 @@
 }
 
 .signal-excellent {
-    color: #2ecc71;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .signal-good {
-    color: #3498db;
+    color: rgba(255, 255, 255, 0.75);
 }
 
 .signal-fair {
-    color: #f39c12;
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .signal-weak {
-    color: #e74c3c;
+    color: rgba(255, 255, 255, 0.4);
 }
 
 .dialog-content {

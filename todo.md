@@ -1,7 +1,9 @@
 
-14. [] Better Styling of the main window
+15. [] add github link in the header menu
+
 
 ---
+14. [x] Better Styling of the main window
 13. [x] add splinner for during network connection
 12. [x] wifi off state widget
 11. [x] scan after the gui is active and wifi is on, otherwise show 'wifi is off' widget
