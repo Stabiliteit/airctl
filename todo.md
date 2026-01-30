@@ -1,8 +1,9 @@
 
-15. [] add github link in the header menu
 
 
 ---
+15. [x] add github link in the header menu
+16. [x] add about section
 14. [x] Better Styling of the main window
 13. [x] add splinner for during network connection
 12. [x] wifi off state widget

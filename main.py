@@ -1,7 +1,7 @@
 import sys
 
 import gi
-from gi.repository import Gdk, GLib, Gtk
+from gi.repository import Gdk, GLib, Gtk, Gio
 
 from core.network_manager import NetworkManager
 from core.ui.app_header import AppHeader
@@ -26,6 +26,8 @@ class AppWindow(Gtk.ApplicationWindow):
 
         header_bar = AppHeader()
         self.set_titlebar(header_bar)
+
+        self._setup_actions()
 
         main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         main_box.set_spacing(0)
@@ -72,6 +74,45 @@ class AppWindow(Gtk.ApplicationWindow):
         self._update_wifi_state(NetworkManager.wifi_status())
 
         GLib.timeout_add(1000, self._check_wifi_status)
+
+    def _setup_actions(self):
+        about_action = Gio.SimpleAction.new("about", None)
+        about_action.connect("activate", self._show_about_dialog)
+        self.get_application().add_action(about_action)
+
+        github_action = Gio.SimpleAction.new("github", None)
+        github_action.connect("activate", self._open_github)
+        self.get_application().add_action(github_action)
+
+    def _show_about_dialog(self, action, param):
+        about = Gtk.AboutDialog()
+        about.set_transient_for(self)
+        about.set_modal(True)
+        about.set_program_name("AIRCTL")
+        about.set_version("1.0.0")
+        about.set_comments("A modern WiFi management tool for Linux")
+        about.set_website("https://github.com/pshycodr/airctl")
+        about.set_website_label("View on GitHub")
+        about.set_authors(["pshycodr"])
+        about.set_license_type(Gtk.License.MIT_X11)
+        about.set_logo_icon_name("network-wireless-symbolic")
+
+        about.set_copyright("© 2026 pshycodr")
+
+        about.add_credit_section("Thanks to", [
+            "nmcli team",
+            "GTK developers",
+            "Open source community"
+        ])
+
+        about.present()
+
+    def _open_github(self, action, param):
+        import subprocess
+        try:
+            subprocess.Popen(["xdg-open", "https://github.com/pshycodr/airctl"])
+        except Exception as e:
+            print(f"Failed to open GitHub link: {e}")
 
     def _check_wifi_status(self):
         current_status = NetworkManager.wifi_status()

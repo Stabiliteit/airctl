@@ -1,5 +1,5 @@
 import gi
-from gi.repository import Gtk
+from gi.repository import Gio, Gtk
 
 gi.require_version("Gtk", "4.0")
 
@@ -7,8 +7,14 @@ gi.require_version("Gtk", "4.0")
 class AppHeader(Gtk.HeaderBar):
     def __init__(self):
         super().__init__()
-        start_button = Gtk.Button(label="start button")
-        self.pack_start(start_button)
 
-        menu_button = Gtk.Button(icon_name="open-menu-symbolic")
+        menu = Gio.Menu()
+
+        menu.append("About", "app.about")
+        menu.append("View on GitHub", "app.github")
+
+        menu_button = Gtk.MenuButton()
+        menu_button.set_icon_name("open-menu-symbolic")
+        menu_button.set_menu_model(menu)
+
         self.pack_end(menu_button)
