@@ -2,9 +2,9 @@ import gi
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk
 
-from models import NetworkInfo
-from network_manager import NetworkManager
-from ui.dialog_box import DialogBox
+from airctl.models import NetworkInfo
+from airctl.network_manager import NetworkManager
+from airctl.ui.dialog_box import DialogBox
 
 
 

@@ -2,12 +2,13 @@ import sys
 
 import gi
 gi.require_version("Gtk", "4.0")
+gi.require_version("Gdk", "4.0")
 from gi.repository import Gdk, GLib, Gtk, Gio
 
-from network_manager import NetworkManager
-from ui.app_header import AppHeader
-from ui.network_list import NetworkListWidget
-from ui.wifi_off_widget import WiFiOffWidget
+from airctl.network_manager import NetworkManager
+from airctl.ui.app_header import AppHeader
+from airctl.ui.network_list import NetworkListWidget
+from airctl.ui.wifi_off_widget import WiFiOffWidget
 
 
 css_provider = Gtk.CssProvider()

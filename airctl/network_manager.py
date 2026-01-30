@@ -1,6 +1,6 @@
 import time
 import nmcli
-from models import NetworkInfo, scaned_networks
+from airctl.models import NetworkInfo, scaned_networks
 
 """
 Responsibilities:
