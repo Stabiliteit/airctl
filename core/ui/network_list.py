@@ -200,15 +200,15 @@ class NetworkListWidget(Gtk.Box):
 
         card.append(signal_percentage_label)
 
-        settings_button = Gtk.Button()
-        settings_button.set_icon_name("emblem-system-symbolic")
-        settings_button.add_css_class("flat")
-        settings_button.add_css_class("circular")
-        settings_button.set_valign(Gtk.Align.CENTER)
-        settings_button.set_tooltip_text("Network Settings")
-        settings_button.connect("clicked", lambda _: self._open_network_info(network["ssid"]))
+        network_info_btn = Gtk.Button()
+        network_info_btn.set_icon_name("go-next-symbolic")
+        network_info_btn.add_css_class("flat")
+        network_info_btn.add_css_class("circular")
+        network_info_btn.set_valign(Gtk.Align.CENTER)
+        network_info_btn.set_tooltip_text("Network Actions and Info")
+        network_info_btn.connect("clicked", lambda _: self._open_network_info(network["ssid"]))
 
-        card.append(settings_button)
+        card.append(network_info_btn)
 
         click = Gtk.GestureClick()
         click.connect("released", lambda *args: self._open_network_info(network["ssid"]))
