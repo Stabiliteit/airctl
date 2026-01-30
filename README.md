@@ -5,16 +5,21 @@
 
 ---
 
+<br/>
+
   <p align="center">
     <i>A modern WiFi management tool for Linux built with GTK4 and Python.</i>
     <i>AIRCTL provides a clean interface to scan, connect, and manage wireless networks.</i>
   </p>
 
+---
+<br/>
+
   [![GitHub stars](https://img.shields.io/github/stars/pshycodr/airctl?style=social)](https://github.com/pshycodr/airctl/stargazers)
   [![GitHub forks](https://img.shields.io/github/forks/pshycodr/airctl?style=social)](https://github.com/pshycodr/airctl/network/members)
   [![GitHub watchers](https://img.shields.io/github/watchers/pshycodr/airctl?style=social)](https://github.com/pshycodr/airctl/watchers)
 
-  [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+  [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
   [![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
   [![GTK](https://img.shields.io/badge/GTK-4.0-green.svg)](https://www.gtk.org/)
 
