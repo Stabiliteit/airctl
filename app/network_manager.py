@@ -2,7 +2,7 @@ import time
 
 import nmcli
 
-from core.models import NetworkInfo, scaned_networks
+from models import NetworkInfo, scaned_networks
 
 """
 Responsibilities:

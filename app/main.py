@@ -3,10 +3,10 @@ import sys
 import gi
 from gi.repository import Gdk, GLib, Gtk, Gio
 
-from core.network_manager import NetworkManager
-from core.ui.app_header import AppHeader
-from core.ui.network_list import NetworkListWidget
-from core.ui.wifi_off_widget import WiFiOffWidget
+from network_manager import NetworkManager
+from ui.app_header import AppHeader
+from ui.network_list import NetworkListWidget
+from ui.wifi_off_widget import WiFiOffWidget
 
 gi.require_version("Gtk", "4.0")
 

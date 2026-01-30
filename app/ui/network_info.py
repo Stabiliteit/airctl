@@ -1,9 +1,9 @@
 import gi
 from gi.repository import Gtk
 
-from core.models import NetworkInfo
-from core.network_manager import NetworkManager
-from core.ui.dialog_box import DialogBox
+from models import NetworkInfo
+from network_manager import NetworkManager
+from ui.dialog_box import DialogBox
 
 gi.require_version("Gtk", "4.0")
 

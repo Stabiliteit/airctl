@@ -3,9 +3,9 @@ import threading
 import gi
 from gi.repository import GLib, Gtk
 
-from core.network_manager import NetworkManager
-from core.ui.dialog_box import DialogBox
-from core.ui.network_info import NetworkInfoWindow
+from network_manager import NetworkManager
+from ui.dialog_box import DialogBox
+from ui.network_info import NetworkInfoWindow
 
 gi.require_version("Gtk", "4.0")
 
