@@ -97,7 +97,7 @@ class AppWindow(Gtk.ApplicationWindow):
         about.set_website("https://github.com/pshycodr/airctl")
         about.set_website_label("View on GitHub")
         about.set_authors(["pshycodr"])
-        about.set_license_type(Gtk.License.MIT_X11)
+        about.set_license_type(Gtk.License.GPL_3_0)
         about.set_logo_icon_name("network-wireless-symbolic")
 
         about.set_copyright("© 2026 pshycodr")
