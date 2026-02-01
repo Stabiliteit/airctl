@@ -2,17 +2,7 @@ import time
 import nmcli
 from airctl.models import NetworkInfo, scaned_networks
 
-"""
-Responsibilities:
-1. Scan all available Wifi
-2. Connect to the choosen wifi
-3. Disconnect to the choosen
-4. Handle refresh network (force rescan)
-5. Get info about the connected network
-"""
-
 nmcli.disable_use_sudo()
-
 
 class NetworkManager:
     @staticmethod
