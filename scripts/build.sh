@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -e
+
+echo "Building AIRCTL..."
+
+if [ ! -f "pyproject.toml" ]; then
+  echo "Error: Run this script from the project root directory."
+  exit 1
+fi
+
+if [ ! -d ".venv" ]; then
+  echo "Error: .venv not found."
+  echo "Run: uv sync"
+  exit 1
+fi
+
+if [ -z "$VIRTUAL_ENV" ]; then
+  echo "Error: Virtual environment not activated."
+  echo "Run: source .venv/bin/activate"
+  exit 1
+fi
+
+if ! command -v nuitka >/dev/null 2>&1; then
+  echo "Error: nuitka not found in virtual environment."
+  exit 1
+fi
+
+echo "Starting Nuitka build..."
+
+nuitka \
+  --onefile \
+  --include-package=gi \
+  --include-module=nmcli \
+  --include-data-files=airctl/styles/style.css=airctl/styles/style.css \
+  --output-dir=out \
+  --output-filename=airctl.bin \
+  airctl/main.py
+
+echo "Build complete."
+echo "Binary available at: out/airctl.bin"
