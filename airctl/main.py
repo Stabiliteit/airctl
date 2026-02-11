@@ -5,6 +5,7 @@ gi.require_version("Gtk", "4.0")
 gi.require_version("Gdk", "4.0")
 from gi.repository import Gdk, GLib, Gtk, Gio
 
+from airctl.main_cli import AirctlCli
 from airctl.network_manager import NetworkManager
 from airctl.ui.app_header import AppHeader
 from airctl.ui.network_list import NetworkListWidget
@@ -159,6 +160,15 @@ class MyApp(Gtk.Application):
         win.present()
 
 
-if __name__ == "__main__":
+def main():
+    if len(sys.argv) > 1:
+        cli = AirctlCli()
+        sys.exit(cli.run(sys.argv[1:]))
+
     app = MyApp()
-    app.run(sys.argv)
+    return app.run(sys.argv)
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+
