@@ -8,6 +8,7 @@ dependencies = [
     "nmcli>=1.7.0",
     "nuitka>=2.8.10",
     "pygobject>=3.54.5",
+    "rich>=14.3.2",
 ]
 
 [project.scripts]
