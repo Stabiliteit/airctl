@@ -116,6 +116,13 @@ class NetworkManager:
         except Exception:
             return None
 
+    def get_active_network_info():
+        try:
+            devices = nmcli.device()
+            return devices[0]
+        except Exception:
+            return {}
+
     @staticmethod
     def forget_network(ssid: str):
         try:
@@ -139,7 +146,7 @@ class NetworkManager:
                 "success": False,
                 "message": f"Error while deleting the network: {str(err)}",
             }
-            
+
     @staticmethod
     def _get_frequency(freq) -> str:
 
